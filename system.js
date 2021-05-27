@@ -54,7 +54,7 @@ const runPrompt = () => {
 
 const readEmployees = () => {
   console.log('Selecting all employees...\n');
-  connection.query('SELECT * FROM employee INNER JOIN role ON role.id=employee.role_id INNER JOIN department ON department.id=role.department_id', (err, res) => {
+  connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON department.id=role.department_id', (err, res) => {
     if (err) throw err;
     console.table(res);
     runPrompt();
@@ -62,14 +62,57 @@ const readEmployees = () => {
 };
 
 const readDepartments = () => {
-    console.log('Selecting all departments...\n');
-    connection.query('SELECT * FROM department', (err, res) => {
-      if (err) throw err;
-      // Log all results of the SELECT statement
-      console.table(res);
-      runPrompt();
-    });
-  };
+    inquirer
+    .prompt({
+        name: 'department',
+        type: 'rawlist',
+        message: 'What department do you want to look up?',
+        choices: [
+            'Sales',
+            'Accounting',
+            'Finance'
+        ]
+    })
+    .then((answer) => {
+        switch (answer.department) {
+            case 'Sales':
+                console.log('Selecting all employees in Sales...\n');
+                connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON department.id=role.department_id WHERE ?',
+                {
+                    department_name: 'Sales'
+                }, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    runPrompt();
+                });
+                break;
+
+            case 'Accounting':
+                console.log('Selecting all employees in Sales...\n');
+                connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON department.id=role.department_id WHERE ?',
+                {
+                    department_name: 'Accounting'
+                }, (err, res) => {
+                    if (err) throw err;
+                console.table(res);
+                runPrompt();
+                });
+                break;
+            
+            case 'Finance':
+                console.log('Selecting all employees in Sales...\n');
+                connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON department.id=role.department_id WHERE ?',
+                {
+                    department_name: 'Finance'
+                }, (err, res) => {
+                    if (err) throw err;
+                console.table(res);
+                runPrompt();
+                });
+                break;
+        }
+    })
+}
 
 
 
