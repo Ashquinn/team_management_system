@@ -1,6 +1,17 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const roles = ['Sales Associate', 'Junior Sales Associate', 'Senior Sales Associate', 'Accountant', 'Junior Accountant', 'Senior Accountant', 'Financial Analyst', 'Financial Manager']
+const roleDetails = {
+    'Sales Associate':[1, 50000, 1],
+    'Junior Sales Associate' :[2, 75000, 1], 
+    'Senior Sales Associate': [3, 105000, 1],
+    'Accountant': [4, 65000, 2], 
+    'Junior Accountant': [5, 85000, 2], 
+    'Senior Accountant': [6, 125000, 2], 
+    'Financial Analyst': [7, 65000, 3], 
+    'Financial Manager': [8, 70000, 3]
+}
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -48,7 +59,7 @@ const runPrompt = () => {
             case 'Exit':
                 exitApp();
                 break;
-        }
+        };
     });
 };
 
@@ -110,10 +121,60 @@ const readDepartments = () => {
                 runPrompt();
                 });
                 break;
-        }
-    })
-}
+        };
+    });
+};
 
+//PARTIALLY WORKS
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: `What is the employee's first name?`,
+            name: 'firstName'
+        },
+        {
+            type: 'input',
+            message: `What is the employee's last name?`,
+            name: 'lastName'
+        },
+        {
+            type: 'list',
+            message: `What is the employee's role?`,
+            name: 'role',
+            choices: roles
+        }
+    ])
+    .then((answer) => {
+        connection.beginTransaction(function(err) {
+            if (err) { throw err; }
+            connection.query(
+                'INSERT INTO employee SET ?',
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: roleDetails[answer.role][0]
+                }
+            ) 
+            connection.query(
+                'INSERT INTO role SET ?',
+                {
+                    title: answer.role,
+                    salary: roleDetails[answer.role][1],
+                    department_id: roleDetails[answer.role][2]
+                }
+            );
+            connection.commit(function(err) {
+                if (err) {
+                  return connection.rollback(function() {
+                    throw err;
+                  });
+                }
+              });
+        });
+    });
+    readEmployees();
+}
 
 
 connection.connect((err) => {
