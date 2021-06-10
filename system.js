@@ -38,6 +38,7 @@ const runPrompt = () => {
             'Exit'
         ]
     })
+//Switch statement which will direct the user to a different function based upon their initial response
     .then((answer) => {
         switch (answer.action) {
             case 'View all employees':
@@ -63,6 +64,7 @@ const runPrompt = () => {
     });
 };
 
+//This simple block will read all the employees in the database and include their first and last name, role, salary, and department.
 const readEmployees = () => {
   console.log('Selecting all employees...\n');
   connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON department.id=role.department_id', (err, res) => {
@@ -72,6 +74,7 @@ const readEmployees = () => {
   });
 };
 
+//The following block of call will render all employees based upon thier department. A switch statement is used to direct to the different departments. 
 const readDepartments = () => {
     inquirer
     .prompt({
@@ -125,7 +128,7 @@ const readDepartments = () => {
     });
 };
 
-//PARTIALLY WORKS
+//Here the user will be able to an employee. The user will enter thier first and last name and the employee role. The new employee will then be added to the database accordingly.
 const addEmployee = () => {
     inquirer.prompt([
         {
@@ -158,8 +161,7 @@ const addEmployee = () => {
     });
 }
 
-peopleArray = []
-
+//This following block of code will allow the user to update any employee's role.
 const updateEmployee = () => {
     connection.query(
         'SELECT employee.first_name, employee.last_name FROM employee',
@@ -206,11 +208,13 @@ const updateEmployee = () => {
     });
 }
 
+//Initializes the beginning prompt upon launch.
 connection.connect((err) => {
   if (err) throw err;
   runPrompt();
 });
 
+//Exits and ends the connection.
 const exitApp = () => {
     connection.end();
   };
