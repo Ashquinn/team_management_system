@@ -146,8 +146,6 @@ const addEmployee = () => {
         }
     ])
     .then((answer) => {
-        connection.beginTransaction(function(err) {
-            if (err) { throw err; }
             connection.query(
                 'INSERT INTO employee SET ?',
                 {
@@ -155,27 +153,58 @@ const addEmployee = () => {
                     last_name: answer.lastName,
                     role_id: roleDetails[answer.role][0]
                 }
-            ) 
-            connection.query(
-                'INSERT INTO role SET ?',
-                {
-                    title: answer.role,
-                    salary: roleDetails[answer.role][1],
-                    department_id: roleDetails[answer.role][2]
-                }
-            );
-            connection.commit(function(err) {
-                if (err) {
-                  return connection.rollback(function() {
-                    throw err;
-                  });
-                }
-              });
-        });
+            )
+        readEmployees(); 
     });
-    readEmployees();
 }
 
+peopleArray = []
+
+const updateEmployee = () => {
+    connection.query(
+        'SELECT employee.first_name, employee.last_name FROM employee',
+        function (err, res) {
+            if (err) throw err
+            res.forEach(person => {
+                peopleArray.push(person.first_name + " " + person.last_name)
+            });
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    message: `Which employee do you want to update?`,
+                    name: 'employee',
+                    choices: peopleArray
+                },
+                {
+                    type: 'list',
+                    message: `What is the employee's new role?`,
+                    name: 'role',
+                    choices: roles
+                }
+            ])
+            .then((answer) => {
+                let firstName = answer.employee.split(" ")[0]
+                let lastName = answer.employee.split(" ")[1]
+                connection.query(
+                    'UPDATE employee SET ? WHERE ? and ?', [
+                        {
+                            role_id: roleDetails[answer.role][0]
+                        },
+                        {
+                            first_name: firstName
+                        },
+                        {
+                            last_name: lastName
+                        }
+                    ], (err,res) => {
+                        if (err) throw err
+                    }
+                    
+                )
+                readEmployees();
+        })
+    });
+}
 
 connection.connect((err) => {
   if (err) throw err;
