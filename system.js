@@ -161,6 +161,8 @@ const addEmployee = () => {
     });
 }
 
+peopleArray = []
+
 //This following block of code will allow the user to update any employee's role.
 const updateEmployee = () => {
     connection.query(
