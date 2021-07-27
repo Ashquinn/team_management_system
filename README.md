@@ -1,7 +1,7 @@
 # Team Management System ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Description
-Team Management System is a command-line application that allows the user to manage and thrack thier employees. Users can view all the employees in thier database, add employees and assign them roles, and lastly update an employees role.
+Team Management System is a command-line application that allows the user to manage and track thier employees. Users can view all the employees in thier database, add employees and assign them roles, and lastly update an employees role.
 
         
 ## Installation     
